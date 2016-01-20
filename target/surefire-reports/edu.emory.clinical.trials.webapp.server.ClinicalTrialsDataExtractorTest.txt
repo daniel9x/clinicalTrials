@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: edu.emory.clinical.trials.webapp.server.ClinicalTrialsDataExtractorTest
--------------------------------------------------------------------------------
-Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.236 sec

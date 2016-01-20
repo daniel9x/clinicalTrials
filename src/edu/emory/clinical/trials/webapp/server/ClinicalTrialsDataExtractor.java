@@ -108,22 +108,7 @@ public class ClinicalTrialsDataExtractor implements Job {
 
 				try {
 
-					InputStream input =  getClass().getClassLoader().getResourceAsStream("clinicaltrials.gov");
-
-					SSLExcludeCipherConnectionHelper sslExclHelper = new SSLExcludeCipherConnectionHelper(input);
-
-					/* TODO -- Remove the SSLExcludeHelper once we have upgraded to JBOSS 6 EAP
-					 * 
-					 * Solution found: http://stackoverflow.com/questions/6851461/java-why-does-ssl-handshake-give-could-not-generate-dh-keypair-exception
-					 * 
-					 * Search for "SSLExcludeHelper"
-					 * 
-					 * Removing DH Key Exchange method via this somewhat hacky and manual way as it's causing errors 
-					 * with older versions of Java. We can remove the "SSL Exclude Cipher Helper" can be removed once we migrate
-					 * to a newer Java where apparently this issue was resolved. 
-					 * 
-					 * */
-					ClinicalTrialXml clinicalTrialXml = (ClinicalTrialXml) unmarshaller.unmarshal(sslExclHelper.get(url));
+					ClinicalTrialXml clinicalTrialXml = (ClinicalTrialXml) unmarshaller.unmarshal(url);
 
 					// Get Data from XML and convert it to (Persistable) Java Object
 					ClinicalTrialStaging trial = convertXmlToStudyObject(clinicalTrialXml);
