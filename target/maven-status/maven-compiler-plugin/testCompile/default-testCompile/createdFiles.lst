@@ -1,0 +1,10 @@
+edu/emory/clinical/trials/webapp/server/rest/SmokeTestTest.class
+edu/emory/clinical/trials/webapp/server/DOSSLSocketFactoryTest.class
+edu/emory/clinical/trials/webapp/server/rest/ClinicalTrialsRestServiceTest.class
+edu/emory/clinical/trials/webapp/server/entity/EntityTest.class
+edu/emory/clinical/trials/webapp/server/ClinicalTrialsDataExtractorTest.class
+edu/emory/clinical/trials/webapp/server/entity/UtilityTest.class
+edu/emory/clinical/trials/webapp/server/job/JobTest.class
+edu/emory/clinical/trials/webapp/server/EmailManagerTest.class
+edu/emory/clinical/trials/webapp/server/InitTest.class
+edu/emory/clinical/trials/webapp/server/rest/HibernateTest.class

@@ -1,0 +1,21 @@
+package edu.emory.clinical.trials.webapp.server.job;
+
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+
+import edu.emory.clinical.trials.webapp.server.LogUtil;
+
+public class TestJob implements Job {
+
+	public void execute(JobExecutionContext context) throws JobExecutionException {
+
+		try {
+			System.out.println("I'm a Job!");
+			LogUtil.logJobResult("TestJob", "", true);
+		}
+		catch (Exception e) {
+			LogUtil.logJobResult("TestJob", e.getMessage(), false);
+		}
+	}
+}

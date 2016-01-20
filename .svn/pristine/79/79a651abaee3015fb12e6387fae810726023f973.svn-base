@@ -1,0 +1,35 @@
+package edu.emory.clinical.trials.webapp.server.entity;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
+@Embeddable
+public class ClinicalTrialKeywordPrimaryKey implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Column(name = "nct_id")
+	private String nctId;
+
+	@Column(name = "keyword")
+	private String keyword;
+
+	public String getNctId() {
+		return nctId;
+	}
+
+	public void setNctId(String nctId) {
+		this.nctId = nctId;
+	}
+
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
+}
+

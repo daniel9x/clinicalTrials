@@ -1,0 +1,15 @@
+package edu.emory.clinical.trials.webapp.server.entity;
+
+import org.junit.Test;
+
+import edu.emory.clinical.trials.webapp.server.LogUtil;
+import edu.emory.clinical.trials.webapp.server.Util;
+
+public class UtilityTest {
+	
+	@Test
+	public void testJobLog() {
+		Util.isTestMode = true;
+		LogUtil.logJobResult("test", "test", true);
+	}
+}

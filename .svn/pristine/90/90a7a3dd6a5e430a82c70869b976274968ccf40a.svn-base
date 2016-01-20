@@ -1,0 +1,56 @@
+package edu.emory.clinical.trials.webapp.server.xmlobject;
+
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+public class ParticipantFlow {
+
+	@XmlElement(name="recruitment_details")
+	private String recruitmentDetails;
+	
+	@XmlElement(name="pre_assignment_details")
+	private String preAssignmentDetails;
+	
+	@XmlElement(name="group_list")
+	private List<Group> groupList;
+	
+	@XmlElement(name="period_list")
+	private List<Period> periodList;
+
+	public String getRecruitmentDetails() {
+		return recruitmentDetails;
+	}
+
+	public void setRecruitmentDetails(String recruitmentDetails) {
+		this.recruitmentDetails = recruitmentDetails;
+	}
+
+	public String getPreAssignmentDetails() {
+		return preAssignmentDetails;
+	}
+
+	public void setPreAssignmentDetails(String preAssignmentDetails) {
+		this.preAssignmentDetails = preAssignmentDetails;
+	}
+
+	public List<Group> getGroupList() {
+		return groupList;
+	}
+
+	public void setGroupList(List<Group> groupList) {
+		this.groupList = groupList;
+	}
+
+	public List<Period> getPeriodList() {
+		return periodList;
+	}
+
+	public void setPeriodList(List<Period> periodList) {
+		this.periodList = periodList;
+	}
+
+}

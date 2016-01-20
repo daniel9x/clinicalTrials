@@ -1,0 +1,24 @@
+package edu.emory.clinical.trials.webapp.server.entity;
+
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "job_lock")
+public class JobLock {
+	
+	@Id
+	@Column(name = "server_name")
+	private String serverName;
+
+	public void setServerName(String serverName) {
+		this.serverName = serverName;
+	}
+
+	public String getServerName() {
+		return serverName;
+	}
+}

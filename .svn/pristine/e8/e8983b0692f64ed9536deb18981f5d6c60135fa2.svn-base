@@ -1,0 +1,31 @@
+package edu.emory.clinical.trials.webapp.server.rest;
+
+import static org.junit.Assert.*;
+
+import javax.ws.rs.core.Application;
+
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.test.JerseyTest;
+import org.junit.Test;
+
+import edu.emory.clinical.trials.webapp.server.rest.ClinicalTrialsRestService;
+
+public class ClinicalTrialsRestServiceTest extends JerseyTest {
+	
+	@Test
+	public void testTotalWithStatusParam() {
+		String total = target("/trials/total").queryParam("status","active").request().get(String.class);
+		assertNotNull(total);
+	}
+	
+	@Test
+	public void testSearchWithParam() {
+		String searchResults = target("/trials/search").queryParam("criteria","cancer").request().get(String.class);
+		assertNotNull(searchResults);
+	}
+
+	@Override
+	protected Application configure() {
+		return new ResourceConfig(ClinicalTrialsRestService.class);
+	}
+}

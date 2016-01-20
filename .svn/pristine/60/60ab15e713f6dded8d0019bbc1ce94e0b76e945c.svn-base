@@ -1,0 +1,202 @@
+package edu.emory.clinical.trials.webapp.server.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "ct_study")
+public class ClinicalTrial implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@Column(name = "nct_id")
+	private String nctId;
+	
+	@Column(name = "org_study_id")
+	private String orgStudyId;
+	
+	@Column(name = "secondary_id")
+	private String secondaryId;
+	
+	@Column(name = "nct_alias")
+	private String nctAlias;
+	
+	@Column(name = "brief_title")
+	private String briefTitle;
+	
+	@Column(name = "official_title")
+	private String officialTitle;
+	
+	@Column(name = "lead_sponsor")
+	private String leadSponsor;
+	
+	@Column(name = "collaborator")
+	private String collaborator;
+	
+	@Column(name = "source")
+	private String source;
+	
+	@Column(name = "authority")
+	private String authority;
+	
+	@Column(name = "has_dmc")
+	private String hasDmc;
+	
+	@Column(name = "brief_summary")
+	private String briefSummary;
+	
+	@Column(name = "overall_status")
+	private String overallStatus;
+	
+	@Column(name = "start_date")
+	private String startDate;
+	
+	@Column(name = "end_date")
+	private String endDate;
+	
+	@Column(name = "why_stopped")
+	private String whyStopped;
+	
+	@Column(name = "primary_completion_date")
+	private String primaryCompletionDate;
+	
+	@Column(name = "phase")
+	private String phase;
+	
+	@Column(name = "study_type")
+	private String studyType;
+	
+	@Column(name = "study_design")
+	private String studyDesign;
+	
+	@Column(name = "primary_outcome_measure")
+	private String primaryOutcomeMeasure;
+	
+	@Column(name = "primary_outcome_time_frame")
+	private String primaryOutcomeTimeFrame;
+	
+	@Column(name = "primary_outcome_safety_issue")
+	private String primaryOutcomeSafetyIssue;
+	
+	@Column(name = "primary_outcome_description")
+	private String primaryOutcomeDescription;
+	
+	@Column(name = "secondary_outcome_measure")
+	private String secondaryOutcomeMeasure;
+	
+	@Column(name = "secondary_outcome_time_frame")
+	private String secondaryOutcomeTimeFrame;
+	
+	@Column(name = "secondary_outcome_safety_issue")
+	private String secondaryOutcomeSafetyIssue;
+	
+	@Column(name = "secondary_outcome_description")
+	private String secondaryOutcomeDescription;
+	
+	@Column(name = "number_of_arms")
+	private String numberOfArms;
+	
+	@Column(name = "enrollment_type")
+	private String enrollmentType;
+	
+	@Column(name = "condition")
+	private String condition;
+	
+	@Column(name = "arm_group_label")
+	private String armGroupLabel;
+	
+	@Column(name = "arm_group_type")
+	private String armGroupType;
+	
+	@Column(name = "arm_group_description")
+	private String armGroupDescription;
+	
+	@Column(name = "eligibility_criteria")
+	private String eligibilityCriteria;
+	
+	@Column(name = "gender")
+	private String gender;
+	
+	@Column(name = "minimum_age")
+	private String minimumAge;
+	
+	@Column(name = "maximum_age")
+	private String maximumAge;
+	
+	@Column(name = "healthy_volunteers")
+	private String healthyVolunteers;
+	
+	@Column(name = "verification_date")
+	private String verificationDate;
+	
+	@Column(name = "lastchanged_date")
+	private String lastChangedDate;
+	
+	@Column(name = "firstreceived_date")
+	private String firstReceivedDate;
+	
+	@Column(name = "responsible_party_type")
+	private String responsiblePartyType;
+	
+	@Column(name = "investigator_affiliation")
+	private String investigatorAffiliation;
+	
+	@Column(name = "investigator_full_name")
+	private String investigatorFullName;
+	
+	@Column(name = "investigator_title")
+	private String investigatorTitle;
+	
+	@Column(name = "is_fda_regulated")
+	private String isFdaRegulated;
+	
+	@Column(name = "is_section_801")
+	private String isSection801;
+	
+	@Column(name = "has_expanded_access")
+	private String hasExpandedAccess;
+	
+	@Column(name = "clinical_results")
+	private String clinicalResults;
+	
+	@Column(name = "emory_specific_status")
+	private String emorySpecificStatus;
+	
+	@Column(name = "transfer_date")
+	private Date transferDate;
+	
+	@Column(name = "overall_contact_name")
+	private String overallContactName;
+	
+	@Column(name = "overall_contact_phone")
+	private String overallContactPhone;
+	
+	@Column(name = "overall_contact_email")
+	private String overallContactEmail;
+	
+	@Column(name = "overall_contact_backup_name")
+	private String overallContactBackupName;
+	
+	@Column(name = "overall_contact_backup_phone")
+	private String overallContactBackupPhone;
+	
+	@Column(name = "overall_contact_backup_email")
+	private String overallContactBackupEmail;
+	
+	public void setNctId(String nctId) {
+		this.nctId = nctId;
+	}
+
+	public void setBriefTitle(String briefTitle) {
+		this.briefTitle = briefTitle;
+	}
+}

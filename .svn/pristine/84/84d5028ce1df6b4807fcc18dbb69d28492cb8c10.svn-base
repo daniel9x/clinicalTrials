@@ -1,0 +1,34 @@
+package edu.emory.clinical.trials.webapp.server.xmlobject;
+
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Milestone {
+	
+	@XmlElement(name="title")
+	private String title;
+	
+	@XmlElement(name="participant_list")
+	private List<Participants> participantList;
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public List<Participants> getParticipantList() {
+		return participantList;
+	}
+
+	public void setParticipantList(List<Participants> participantList) {
+		this.participantList = participantList;
+	}
+
+}

@@ -1,0 +1,44 @@
+package edu.emory.clinical.trials.webapp.server.xmlobject;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+
+@XmlAccessorType(XmlAccessType.FIELD)
+public class ArmGroup {
+
+	@XmlElement(name="arm_group_label")
+	private String armGroupLabel;
+	
+	@XmlElement(name="arm_group_type")
+	private String armGroupType;
+	
+	@XmlElement(name="arm_group_label")
+	private String description;
+
+	public String getArmGroupLabel() {
+		return armGroupLabel;
+	}
+
+	public void setArmGroupLabel(String armGroupLabel) {
+		this.armGroupLabel = armGroupLabel;
+	}
+
+	public String getArmGroupType() {
+		return armGroupType;
+	}
+
+	public void setArmGroupType(String armGroupType) {
+		this.armGroupType = armGroupType;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+}

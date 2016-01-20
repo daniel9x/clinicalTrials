@@ -1,0 +1,38 @@
+package edu.emory.clinical.trials.webapp.server.entity;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "ct_keyword")
+public class ClinicalTrialKeyword {
+	
+	@EmbeddedId
+	private ClinicalTrialKeywordPrimaryKey primaryKey = new ClinicalTrialKeywordPrimaryKey();
+	
+	@Column(name="transfer_date")
+	private Date transferDate;
+
+	public ClinicalTrialKeywordPrimaryKey getPrimaryKey() {
+		return primaryKey;
+	}
+
+	public void setPrimaryKey(ClinicalTrialKeywordPrimaryKey primaryKey) {
+		this.primaryKey = primaryKey;
+	}
+	
+	public Date getTransferDate() {
+		return transferDate;
+	}
+
+	public void setTransferDate(Date transferDate) {
+		this.transferDate = transferDate;
+	}
+
+	
+	
+}

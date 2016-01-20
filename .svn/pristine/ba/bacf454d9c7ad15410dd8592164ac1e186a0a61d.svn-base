@@ -1,0 +1,28 @@
+package edu.emory.clinical.trials.webapp.server.job;
+
+import org.apache.log4j.Logger;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+
+import edu.emory.clinical.trials.webapp.server.ClinicalTrialsDataExtractor;
+import edu.emory.clinical.trials.webapp.server.LogUtil;
+
+public class ClinicalTrialDataExtractorJob implements Job {
+	
+	private Logger logger = Logger.getLogger(ClinicalTrialDataExtractorJob.class.getName());
+	
+	public void execute(JobExecutionContext context) throws JobExecutionException {
+
+		try {
+			ClinicalTrialsDataExtractor ctExtract = new ClinicalTrialsDataExtractor();
+			ctExtract.extract();	
+			LogUtil.logJobResult("ClinicalTrialsDataExtractJob","", true);
+		}
+		catch (Exception e) {
+			LogUtil.logJobResult("ClinicalTrialsDataExtractJob",e.getMessage(), false);
+			logger.error("ERROR:", e);
+		}
+
+	}
+}

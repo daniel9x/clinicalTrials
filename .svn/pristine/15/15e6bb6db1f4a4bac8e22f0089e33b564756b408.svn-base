@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasources>
+	<local-tx-datasource>
+		<jndi-name>ClinicalTrialsDS</jndi-name>
+		<connection-url>jdbc:oracle:thin:@ldap://oranamesrvr2.cc.emory.edu/rhitsecd,cn=OracleContext,dc=emory,dc=edu</connection-url>
+		<user-name>dsgrant</user-name>
+		<password>sJBX1h-eb</password>
+		<driver-class>oracle.jdbc.driver.OracleDriver</driver-class>
+		<min-pool-size>0</min-pool-size>
+		<max-pool-size>200</max-pool-size>
+		<blocking-timeout-millis>60000</blocking-timeout-millis>
+	</local-tx-datasource>
+</datasources>

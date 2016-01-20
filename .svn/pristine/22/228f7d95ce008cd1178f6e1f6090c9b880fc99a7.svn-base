@@ -1,0 +1,50 @@
+package edu.emory.clinical.trials.webapp.server;
+
+import java.net.URL;
+import java.net.URLConnection;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+
+import org.junit.Test;
+import edu.emory.clinical.trials.webapp.server.xmlobject.ClinicalTrialXml;
+
+public class ClinicalTrialsDataExtractorTest {
+	
+	@Test
+	public void testExtract() throws Exception {
+		ClinicalTrialsDataExtractor ctExtract = new ClinicalTrialsDataExtractor();
+		ctExtract.extract();
+	}
+	
+	@Test
+	public void testConvertXMLWithNullValues() throws Exception {
+		JAXBContext context = JAXBContext.newInstance(ClinicalTrialXml.class);
+		
+		Unmarshaller unmarshaller = context.createUnmarshaller();
+		
+		String urlString = "https://clinicaltrials.gov/show/NCT01567462?displayxml=true";
+
+		URL url = new URL(urlString);
+		URLConnection connection = url.openConnection();
+		
+		ClinicalTrialXml clinicalTrialXml = (ClinicalTrialXml) unmarshaller.unmarshal(connection.getInputStream());
+		
+		clinicalTrialXml.setResponsibleParty(null);
+		clinicalTrialXml.setArmGroup(null);
+		clinicalTrialXml.setBriefSummary(null);
+		clinicalTrialXml.setConditionBrowse(null);
+		clinicalTrialXml.setFacility(null);
+		clinicalTrialXml.setInterventions(null);
+		clinicalTrialXml.setInterventionBrowse(null);
+		clinicalTrialXml.setKeywords(null);
+		clinicalTrialXml.setLocations(null);
+		clinicalTrialXml.setOverallContact(null);
+		clinicalTrialXml.setOverallContactBackup(null);
+		clinicalTrialXml.setOverallOfficial(null);
+		clinicalTrialXml.setInterventions(null);
+		clinicalTrialXml.setSecondaryOutcome(null);
+		
+		new ClinicalTrialsDataExtractor().convertXmlToStudyObject(clinicalTrialXml);
+	}
+}

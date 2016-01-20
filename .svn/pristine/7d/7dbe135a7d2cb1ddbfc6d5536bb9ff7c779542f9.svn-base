@@ -1,0 +1,45 @@
+package edu.emory.clinical.trials.webapp.server.job;
+
+import javax.naming.InitialContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
+import org.quartz.CronTrigger;
+import org.quartz.JobDetail;
+import org.quartz.JobExecutionException;
+import org.quartz.impl.StdScheduler;
+
+public class JobExecutorService implements ServletContextListener {
+
+	JobDetail jobDetail;
+
+	@Override
+	public void contextDestroyed(ServletContextEvent arg0) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void contextInitialized(ServletContextEvent arg0) {
+		try {
+			InitialContext ctx = new InitialContext();
+			StdScheduler scheduler = (StdScheduler) ctx.lookup("Quartz");
+
+			jobDetail = new JobDetail("ClinicalTrials-DataExtractionJob",StdScheduler.DEFAULT_GROUP,ClinicalTrialDataExtractorJob.class);
+//			jobDetail = new JobDetail("TestJob",StdScheduler.DEFAULT_GROUP,TestJob.class);
+			CronTrigger trigger = new CronTrigger();
+			// Run Extract Nightly @ Midnight
+			trigger.setCronExpression("0 0 0 * * ?");
+			trigger.setName("ClinicalTrialsDataExtractionJob");
+			scheduler.scheduleJob(jobDetail, trigger);
+			scheduler.start();
+
+		} catch (JobExecutionException e) {
+			//TODO: Log Job Exception
+		}
+
+		catch (Exception exc) {  
+
+		}
+	}
+
+}

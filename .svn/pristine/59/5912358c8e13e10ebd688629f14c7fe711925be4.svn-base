@@ -1,0 +1,13 @@
+package edu.emory.clinical.trials.webapp.server;
+
+import org.junit.Test;
+
+public class ClinicalTrialsDataExtractorTest {
+	
+	@Test
+	public void testExtract() throws Exception {
+		ClinicalTrialsDataExtractor ctExtract = new ClinicalTrialsDataExtractor();
+		ctExtract.extract();
+	}
+
+}

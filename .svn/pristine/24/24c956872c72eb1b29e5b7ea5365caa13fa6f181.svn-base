@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server>
+	<mbean code="org.quartz.ee.jmx.jboss.QuartzService" name="edu.emory.clinical.trials:service=QuartzService,name=QuartzService">
+		<attribute name="JndiName">Quartz</attribute>
+		<attribute name="Properties">
+			org.quartz.scheduler.instanceName = CTQuartzScheduler
+			org.quartz.scheduler.rmi.export = false
+			org.quartz.scheduler.rmi.proxy = false
+			org.quartz.scheduler.xaTransacted = false
+			org.quartz.threadPool.class = org.quartz.simpl.SimpleThreadPool
+			org.quartz.threadPool.threadCount = 5
+			org.quartz.threadPool.threadPriority = 4
+			org.quartz.jobStore.class = org.quartz.simpl.RAMJobStore
+		</attribute>
+	</mbean>
+</server>

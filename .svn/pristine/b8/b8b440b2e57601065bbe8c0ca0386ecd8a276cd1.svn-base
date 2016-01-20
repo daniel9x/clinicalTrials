@@ -1,0 +1,33 @@
+package edu.emory.clinical.trials.webapp.server.xmlobject;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Participants {
+
+	@XmlElement(name="group_id")
+	private String groupId;
+	
+	@XmlElement(name="count")
+	private String count;
+
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
+
+	public String getCount() {
+		return count;
+	}
+
+	public void setCount(String count) {
+		this.count = count;
+	}
+	
+	
+}

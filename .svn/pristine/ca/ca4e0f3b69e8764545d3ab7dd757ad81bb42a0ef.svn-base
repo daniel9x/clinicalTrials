@@ -1,0 +1,23 @@
+package edu.emory.clinical.trials.webapp.server.xmlobject;
+
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+public class ParticipantFlow {
+
+	@XmlElement(name="recruitment_details")
+	private String recruitmentDetails;
+	
+	@XmlElement(name="pre_assignment_details")
+	private String preAssignmentDetails;
+	
+	@XmlElement(name="group_list")
+	private List<Group> groupList;
+	
+	@XmlElement(name="period_list")
+	private List<Period> periodList;
+}

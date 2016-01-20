@@ -1,0 +1,35 @@
+package edu.emory.clinical.trials.webapp.server;
+
+import java.util.Date;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import edu.emory.clinical.trials.webapp.server.entity.JobLog;
+
+public class LogUtil {
+	
+	@PersistenceContext
+	static EntityManager em;
+
+	public static void logJobResult(String jobName, String errorMessage, Boolean success) throws Exception {
+		JobLog jobLog = new JobLog();
+		jobLog.setJobName(jobName);
+		jobLog.setJobCompletionDate(new Date());
+		if (!errorMessage.isEmpty()) {
+			jobLog.setSuccessFlag('N');
+			jobLog.setCauseOfFailure(errorMessage);
+		}
+		else {
+			jobLog.setSuccessFlag('Y');
+		}
+		persistLog(jobLog);
+	}
+
+	private static void persistLog(JobLog jobLog) throws Exception {
+		em.getTransaction().begin();
+		Delegator.persistToDatabase(em, jobLog);
+		em.getTransaction().commit();
+		em.close();
+	}
+}

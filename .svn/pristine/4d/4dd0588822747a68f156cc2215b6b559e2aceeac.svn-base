@@ -1,0 +1,45 @@
+package edu.emory.clinical.trials.webapp.server.rest;
+
+import javax.annotation.PostConstruct;
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceUnit;
+
+import edu.emory.clinical.trials.webapp.server.Delegator;
+
+@Singleton
+@Startup
+public class RestServerConfigurator {
+	private static RestServerConfigurator instance;
+
+	
+	@PersistenceUnit(unitName = "clinicalTrialsEntityManager")
+	private EntityManagerFactory emf;
+	
+	public RestServerConfigurator() {
+		if (emf == null) {
+			System.out.println("NULL!");
+			emf = Delegator.createEntityManagerFactory("clinicalTrialsEntityManager");
+		}
+		else {
+			System.out.println("NOT NULL!");
+		}
+		
+	}
+
+	@PostConstruct
+	public static void init() throws InstantiationException {
+		System.out.println("Do you make it here?");
+		instance = new RestServerConfigurator();
+	}
+
+	public static RestServerConfigurator getInstance() {
+		return instance;
+	}
+
+	public EntityManagerFactory getEmf() {
+		return emf;
+	}
+
+}

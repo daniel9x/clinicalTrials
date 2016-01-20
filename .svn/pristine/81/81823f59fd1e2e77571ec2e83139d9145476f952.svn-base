@@ -1,0 +1,82 @@
+package edu.emory.clinical.trials.webapp.server.entity;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
+@SuppressWarnings("serial")
+@Embeddable
+public class ClinicalTrialKeywordStagingPrimaryKey implements Serializable {
+
+	@Column(name = "nct_id")
+	private String nctId;
+
+	@Column(name = "keyword")
+	private String keyword;
+
+	public String getNctId() {
+		return nctId;
+	}
+
+	public void setNctId(String nctId) {
+		this.nctId = nctId;
+	}
+
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (obj == null) {
+			return false;
+		}
+
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+
+		ClinicalTrialKeywordStagingPrimaryKey other = (ClinicalTrialKeywordStagingPrimaryKey) obj;
+
+		if (nctId == null) {
+			if (other.nctId != null) {
+				return false;
+			}
+		} 
+		else if (!nctId.equals(other.nctId)) {
+			return false;
+		}
+
+		if (keyword == null) {
+			if (other.keyword != null) {
+				return false;
+			}
+		} 
+		else if (!keyword.equals(other.keyword)) {
+			return false;
+		}
+
+		return true;
+	}
+
+
+	public int hashCode() {
+		int code = 0;
+		code += nctId == null ? 0 : nctId.hashCode();
+		code += keyword == null ? 0 : keyword.hashCode();
+		return code;
+
+	}
+
+
+}
+

@@ -1,0 +1,43 @@
+package edu.emory.clinical.trials.webapp.server.xmlobject;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Group {
+	
+	@XmlElement(name="title")
+	private String title;
+	
+	@XmlElement(name="description")
+	private String description;
+	
+	@XmlElement(name="group_id")
+	private String groupId;
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
+
+}

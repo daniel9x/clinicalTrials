@@ -1,0 +1,10 @@
+/Users/dsgrant/Documents/workspace/emory-clinical-trials-webapp/test/java/edu/emory/clinical/trials/webapp/server/entity/EntityTest.java
+/Users/dsgrant/Documents/workspace/emory-clinical-trials-webapp/test/java/edu/emory/clinical/trials/webapp/server/InitTest.java
+/Users/dsgrant/Documents/workspace/emory-clinical-trials-webapp/test/java/edu/emory/clinical/trials/webapp/server/ClinicalTrialsDataExtractorTest.java
+/Users/dsgrant/Documents/workspace/emory-clinical-trials-webapp/test/java/edu/emory/clinical/trials/webapp/server/DOSSLSocketFactoryTest.java
+/Users/dsgrant/Documents/workspace/emory-clinical-trials-webapp/test/java/edu/emory/clinical/trials/webapp/server/entity/UtilityTest.java
+/Users/dsgrant/Documents/workspace/emory-clinical-trials-webapp/test/java/edu/emory/clinical/trials/webapp/server/rest/ClinicalTrialsRestServiceTest.java
+/Users/dsgrant/Documents/workspace/emory-clinical-trials-webapp/test/java/edu/emory/clinical/trials/webapp/server/rest/HibernateTest.java
+/Users/dsgrant/Documents/workspace/emory-clinical-trials-webapp/test/java/edu/emory/clinical/trials/webapp/server/EmailManagerTest.java
+/Users/dsgrant/Documents/workspace/emory-clinical-trials-webapp/test/java/edu/emory/clinical/trials/webapp/server/rest/SmokeTestTest.java
+/Users/dsgrant/Documents/workspace/emory-clinical-trials-webapp/test/java/edu/emory/clinical/trials/webapp/server/job/JobTest.java

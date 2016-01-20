@@ -1,0 +1,464 @@
+package edu.emory.clinical.trials.webapp.server;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import javax.net.ssl.SSLException;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+
+import org.apache.log4j.Logger;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+
+import edu.emory.clinical.trials.webapp.server.entity.ClinicalTrialInterventionStaging;
+import edu.emory.clinical.trials.webapp.server.entity.ClinicalTrialKeywordStaging;
+import edu.emory.clinical.trials.webapp.server.entity.ClinicalTrialKeywordStagingPrimaryKey;
+import edu.emory.clinical.trials.webapp.server.entity.ClinicalTrialLocationStaging;
+import edu.emory.clinical.trials.webapp.server.entity.ClinicalTrialMeshTermStaging;
+import edu.emory.clinical.trials.webapp.server.entity.ClinicalTrialMeshTermStagingPrimaryKey;
+import edu.emory.clinical.trials.webapp.server.entity.ClinicalTrialStaging;
+import edu.emory.clinical.trials.webapp.server.entity.JobLock;
+import edu.emory.clinical.trials.webapp.server.rest.RestServerConfigurator;
+import edu.emory.clinical.trials.webapp.server.rest.TestConfigurator;
+import edu.emory.clinical.trials.webapp.server.xmlobject.ClinicalTrialXml;
+import edu.emory.clinical.trials.webapp.server.xmlobject.Intervention;
+import edu.emory.clinical.trials.webapp.server.xmlobject.Location;
+
+public class ClinicalTrialsDataExtractor implements Job {
+
+	static int locationPrimaryKey = 1;
+
+	static int interventionPrimaryKey;
+
+	private EmailManager emailManager;
+
+	private final EntityManagerFactory emf;
+
+	EntityManager em;
+
+	boolean isTestMode = false;
+
+	boolean isLocked = false;
+
+	private String testNctId = "";
+
+	private Logger logger = Logger.getLogger(ClinicalTrialsDataExtractor.class.getName());
+
+
+	public ClinicalTrialsDataExtractor() {
+		if (RestServerConfigurator.getInstance() != null) {
+			emf = RestServerConfigurator.getInstance().getEmf();
+		}
+		// Using Test
+		else {
+			emf = TestConfigurator.getInstance().getEmf();
+			isTestMode = true;
+		}
+	}
+
+	public void execute(JobExecutionContext context) throws JobExecutionException {
+		try {
+			ClinicalTrialsDataExtractor ctExtract = new ClinicalTrialsDataExtractor();
+			ctExtract.extract();	
+		}
+		catch (Exception e) {
+			logger.error("ERROR:", e);
+		}
+
+	}
+
+	public void extract() throws Exception {
+
+		if (!isTestMode)
+			emailManager = new EmailManager();
+
+		List<String> nctIds = getNctIds();
+
+		JAXBContext context = JAXBContext.newInstance(ClinicalTrialXml.class);
+
+		Unmarshaller unmarshaller = context.createUnmarshaller();
+
+		Collections.sort(nctIds);
+
+		// Using Passed in NCTID for Test Mode
+		if (isTestMode) {
+			nctIds.clear();
+			nctIds.add(testNctId);
+		}
+
+		// Iterate through compiled list of NCTIDs and harvest/persist
+
+		if (isDbUnlocked()) {
+
+			for (String nctId : nctIds) {
+				logger.debug(nctId);
+				String urlString = "https://clinicaltrials.gov/show/" + nctId + "?displayxml=true";
+
+				URL url = new URL(urlString);
+
+				em = emf.createEntityManager();
+
+				try {
+
+					InputStream input =  getClass().getClassLoader().getResourceAsStream("clinicaltrials.gov");
+
+					SSLExcludeCipherConnectionHelper sslExclHelper = new SSLExcludeCipherConnectionHelper(input);
+
+					ClinicalTrialXml clinicalTrialXml = (ClinicalTrialXml) unmarshaller.unmarshal(sslExclHelper.get(url));
+
+					// Get Data from XML and convert it to (Persistable) Java Object
+					ClinicalTrialStaging trial = convertXmlToStudyObject(clinicalTrialXml);
+					trial.setNctId(nctId);
+
+					// Get Keywords
+					List<ClinicalTrialKeywordStaging> keywords = fetchKeywords(nctId, clinicalTrialXml);
+
+					// Get Mesh Terms
+					List<ClinicalTrialMeshTermStaging> meshTerms = fetchMeshTerms(nctId, clinicalTrialXml);
+
+					// Get Interventions
+					List<ClinicalTrialInterventionStaging> interventions = fetchInterventions(nctId,clinicalTrialXml);
+
+					/* Get Location Data -- Currently deprecating / removing this data pull as
+					 * the location data volume is extremely large and there isn't much value in
+					 * caputuring it at this time.
+					 */
+
+					// List<ClinicalTrialLocation> locations = fetchLocations(nctId, clinicalTrialXml);
+					List<ClinicalTrialLocationStaging> locations = new ArrayList<ClinicalTrialLocationStaging>();
+
+					logger.info("Persisting: " + nctId);
+
+					if (!isTestMode)
+						persistObjectsToDB(trial, keywords, meshTerms, locations, interventions, em);
+
+				} catch (SSLException e) {
+					logger.error("ERROR while trying to extract " + nctId + ": ", e);
+					emailManager.sendExtractFailureEmail(e);
+					throw new Exception(e);
+				} catch (UnknownHostException e) {
+					logger.error("ERROR while trying to extract " + nctId + ": ", e);
+					emailManager.sendExtractFailureEmail(e);
+					throw new Exception(e);
+				} catch (IOException e) {
+					logger.error("ERROR while trying to extract " + nctId + ": ", e);
+					logger.error(nctId + " does not exist in ClinicalTrials.gov");
+					ClinicalTrialStaging trial = new ClinicalTrialStaging();
+					trial.setNctId(nctId);
+					trial.setBriefTitle("404: Does not exist in ClinicalTrials.gov");
+					if (!isTestMode)
+						persistObject(trial, em);
+				} catch (Exception e) { 
+					logger.error("ERROR while trying to extract " + nctId + ": ", e);
+					emailManager.sendExtractFailureEmail(e);
+					throw new Exception(e);
+				}
+			}
+			
+			unlockDb();
+			
+			if (!isTestMode)
+			emailManager.sendExtractSuccessEmail(nctIds.size());
+
+		}
+
+	}
+
+	private void persistObjectsToDB(ClinicalTrialStaging trial, List<ClinicalTrialKeywordStaging> keywords, List<ClinicalTrialMeshTermStaging> meshTerms, List<ClinicalTrialLocationStaging> locations, List<ClinicalTrialInterventionStaging> interventions, EntityManager em) throws Exception {
+
+
+
+		persistObject(trial, em);
+
+		try {
+
+			for (ClinicalTrialKeywordStaging keyword : keywords) {
+				persistObject(keyword, em);
+			}
+
+			for (ClinicalTrialMeshTermStaging meshTerm : meshTerms) {
+				persistObject(meshTerm, em);
+			}
+
+			for (ClinicalTrialLocationStaging location : locations) {
+				persistObject(location, em);
+			}
+
+			for (ClinicalTrialInterventionStaging intervention : interventions) {
+				persistObject(intervention, em);
+			}
+
+		}
+
+		catch (Exception e) {
+			logger.error("ERROR:", e);
+			throw new Exception(e);
+		}
+
+		em.close();
+
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<String> getNctIds() {
+
+		em = emf.createEntityManager();
+
+		Query query = em.createQuery("select distinct trim(e.primaryKey.nctId) from ErmsStudy e");
+
+		List<String> nctIds = query.getResultList();
+
+		logger.info("# of NCTIDS pulled from ErmsStudy: " + nctIds.size());
+
+		em.close();
+
+		return nctIds;
+	}
+
+	private void persistObject(Object object, EntityManager em) throws Exception {
+		try {
+			if(!em.getTransaction().isActive()) {
+				em.getTransaction().begin();
+				em.persist(object);
+				em.getTransaction().commit();
+			}
+		}
+		catch (Exception e) {
+			logger.error("ERROR:", e);
+			if (em.getTransaction().isActive()) {
+				em.getTransaction().rollback();
+			}
+			throw new Exception(e);
+		}
+	}
+
+	private List<ClinicalTrialKeywordStaging> fetchKeywords(String nctId, ClinicalTrialXml clinicalTrialXml) {
+		List<String> keywords = clinicalTrialXml.getKeywords();
+		List<ClinicalTrialKeywordStaging> ctKeywords = new ArrayList<ClinicalTrialKeywordStaging>();
+
+		for (String keyword : keywords) {
+			ClinicalTrialKeywordStaging ctKeyword = new ClinicalTrialKeywordStaging();
+			ClinicalTrialKeywordStagingPrimaryKey kPk = new ClinicalTrialKeywordStagingPrimaryKey();
+			kPk.setKeyword(keyword);
+			kPk.setNctId(nctId);
+			ctKeyword.setPrimaryKey(kPk);
+			ctKeyword.setTransferDate(new Date());
+			ctKeywords.add(ctKeyword);
+		}
+
+		return ctKeywords;
+	}
+
+	private List<ClinicalTrialMeshTermStaging> fetchMeshTerms(String nctId, ClinicalTrialXml clinicalTrialXml) {
+		List<String> conditionMeshTerms = clinicalTrialXml.getConditionBrowse().getMeshTerms();
+		List<String> interventionMeshTerms = clinicalTrialXml.getInterventionBrowse().getMeshTerms();
+
+		List<ClinicalTrialMeshTermStaging> meshTerms = new ArrayList<ClinicalTrialMeshTermStaging>();
+
+		for (String conditionMeshTerm : conditionMeshTerms) {
+			ClinicalTrialMeshTermStaging ctMeshTerm = processMeshTerm(conditionMeshTerm, nctId);
+			ctMeshTerm.setMeshTermType("C");
+			ctMeshTerm.setTransferDate(new Date());
+			meshTerms.add(ctMeshTerm);
+		}
+
+		for (String interventionMeshTerm : interventionMeshTerms) {
+			ClinicalTrialMeshTermStaging ctMeshTerm = processMeshTerm(interventionMeshTerm, nctId);
+			ctMeshTerm.setMeshTermType("I");
+			ctMeshTerm.setTransferDate(new Date());
+			meshTerms.add(ctMeshTerm);
+		}
+
+		return meshTerms;
+	}
+
+	private List<ClinicalTrialInterventionStaging> fetchInterventions(String nctId, ClinicalTrialXml clinicalTrialXml) {
+		List<Intervention> interventions = clinicalTrialXml.getInterventions();
+		List<ClinicalTrialInterventionStaging> ctInterventions = new ArrayList<ClinicalTrialInterventionStaging>();
+
+		for (Intervention intervention : interventions) {
+			ClinicalTrialInterventionStaging ctIntervention = new ClinicalTrialInterventionStaging();
+			ctIntervention.setInterventionId(interventionPrimaryKey++);
+			ctIntervention.setInterventionName(intervention.getInterventionName());
+			ctIntervention.setNctId(nctId);
+			ctIntervention.setInterventionType(intervention.getInterventionType());
+			ctIntervention.setOtherName(intervention.getOtherName());
+			ctIntervention.setDescription(intervention.getDescription());
+			ctIntervention.setTransferDate(new Date());
+			ctInterventions.add(ctIntervention);
+		}
+
+		return ctInterventions;
+	}
+
+	//	private List<ClinicalTrialLocation> fetchLocations(String nctId, ClinicalTrialXml clinicalTrialXml) {
+	//		List<Location> locations = clinicalTrialXml.getLocations();
+	//		
+	//		List<ClinicalTrialLocation> ctLocations = new ArrayList<ClinicalTrialLocation>();
+	//		
+	//		for (Location location : locations) {
+	//			ClinicalTrialLocation ctLocation = new ClinicalTrialLocation();
+	//			ctLocation.setId(locationPrimaryKey++);
+	//			ctLocation.setNctId(nctId);
+	//			ctLocation.setCity(location.getFacility().getAddress().getCity());
+	//			ctLocation.setCountry(location.getFacility().getAddress().getCountry());
+	//			ctLocation.setState(location.getFacility().getAddress().getState());
+	//			ctLocation.setStatus(location.getStatus());
+	//			ctLocations.add(ctLocation);
+	//		}
+	//		
+	//		return ctLocations;
+	//	}
+
+	private ClinicalTrialMeshTermStaging processMeshTerm(String meshTerm, String nctId) {
+		ClinicalTrialMeshTermStaging ctMeshTerm = new ClinicalTrialMeshTermStaging();
+		ClinicalTrialMeshTermStagingPrimaryKey mtPk = new ClinicalTrialMeshTermStagingPrimaryKey();
+		mtPk.setMeshTerm(meshTerm);
+		mtPk.setNctId(nctId);
+		ctMeshTerm.setPrimaryKey(mtPk);
+		return ctMeshTerm;
+	}
+
+	public ClinicalTrialStaging convertXmlToStudyObject(ClinicalTrialXml clinicalTrialXml) {
+
+		ClinicalTrialStaging trial = new ClinicalTrialStaging();
+		trial.setOrgStudyId(clinicalTrialXml.getIdInfo().getOrgStudyId());
+		trial.setSecondaryId(clinicalTrialXml.getIdInfo().getSecondaryId());
+		trial.setNctAlias(clinicalTrialXml.getIdInfo().getNctAlias());
+		trial.setBriefTitle(clinicalTrialXml.getBriefTitle());
+		trial.setOfficialTitle(clinicalTrialXml.getOfficialTitle());
+		trial.setLeadSponsor(clinicalTrialXml.getSponsors().getLeadSponsor().getAgency());
+		trial.setCollaborator(clinicalTrialXml.getSponsors().getCollaborator().getAgency());
+		trial.setSource(clinicalTrialXml.getSource());
+		trial.setAuthority(clinicalTrialXml.getOversightInfo().getAuthority());
+		trial.setHasDmc(clinicalTrialXml.getOversightInfo().getHasDmc());
+		if (clinicalTrialXml.getBriefSummary().getTextBlock().length() > 3000) {
+			trial.setBriefSummary(clinicalTrialXml.getBriefSummary().getTextBlock().substring(0, 3000) + "...");
+		}
+		else {
+			trial.setBriefSummary(clinicalTrialXml.getBriefSummary().getTextBlock());
+		}
+		trial.setOverallStatus(clinicalTrialXml.getOverallStatus());
+		trial.setStartDate(clinicalTrialXml.getStartDate());
+		trial.setEndDate(clinicalTrialXml.getEndDate());
+		trial.setWhyStopped(clinicalTrialXml.getWhyStopped());
+		trial.setPrimaryCompletionDate(clinicalTrialXml.getPrimaryCompletionDate());
+		trial.setPhase(clinicalTrialXml.getPhase());
+		trial.setStudyType(clinicalTrialXml.getStudyType());
+		trial.setStudyDesign(clinicalTrialXml.getStudyDesign());
+		trial.setPrimaryOutcomeMeasure(clinicalTrialXml.getPrimaryOutcome().getMeasure());
+		trial.setPrimaryOutcomeTimeFrame(clinicalTrialXml.getPrimaryOutcome().getTimeFrame());
+		trial.setPrimaryOutcomeSafetyIssue(clinicalTrialXml.getPrimaryOutcome().getSafetyIssue());
+		trial.setPrimaryOutcomeDescription(clinicalTrialXml.getPrimaryOutcome().getDescription());
+		trial.setSecondaryOutcomeMeasure(clinicalTrialXml.getSecondaryOutcome().getMeasure());
+		trial.setSecondaryOutcomeTimeFrame(clinicalTrialXml.getSecondaryOutcome().getTimeFrame());
+		trial.setSecondaryOutcomeSafetyIssue(clinicalTrialXml.getSecondaryOutcome().getSafetyIssue());
+		trial.setSecondaryOutcomeDescription(clinicalTrialXml.getSecondaryOutcome().getDescription());
+		trial.setNumberOfArms(clinicalTrialXml.getNumberOfArms());
+		trial.setEnrollmentType(clinicalTrialXml.getEnrollmentType());
+		trial.setCondition(clinicalTrialXml.getCondition());
+		trial.setArmGroupLabel(clinicalTrialXml.getArmGroup().getArmGroupLabel());
+		trial.setArmGroupType(clinicalTrialXml.getArmGroup().getArmGroupType());
+		trial.setArmGroupDescription(clinicalTrialXml.getArmGroup().getDescription());
+		if (clinicalTrialXml.getEligibility().getCriteria().getTextBlock().length() > 3000){
+			trial.setEligibilityCriteria(clinicalTrialXml.getEligibility().getCriteria().getTextBlock().substring(0, 3000) + "...");
+		}
+		else {
+			trial.setEligibilityCriteria(clinicalTrialXml.getEligibility().getCriteria().getTextBlock());
+		}
+		trial.setGender(clinicalTrialXml.getEligibility().getGender());
+		trial.setMinimumAge(clinicalTrialXml.getEligibility().getMinimumAge());
+		trial.setMaximumAge(clinicalTrialXml.getEligibility().getMaximumAge());
+		trial.setHealthyVolunteers(clinicalTrialXml.getEligibility().getHealthyVolunteers());
+		trial.setVerificationDate(clinicalTrialXml.getVerificationDate());
+		trial.setLastChangedDate(clinicalTrialXml.getLastChangedDate());
+		trial.setFirstReceivedDate(clinicalTrialXml.getFirstReceivedDate());
+		trial.setResponsiblePartyType(clinicalTrialXml.getResponsibleParty().getResponsiblePartyType());
+		// If the Responsible Party is a PI and is affiliated with Emory, we will persist the information.
+		if (trial.getResponsiblePartyType().equals("Principal Investigator") && clinicalTrialXml.getResponsibleParty().getInvestigatorAffiliation().contains("Emory")) {
+			trial.setInvestigatorAffiliation(clinicalTrialXml.getResponsibleParty().getInvestigatorAffiliation());
+			trial.setInvestigatorFullName(clinicalTrialXml.getResponsibleParty().getInvestigatorFullName());
+			trial.setInvestigatorTitle(clinicalTrialXml.getResponsibleParty().getInvestigatorTitle());
+		}
+		// Use "Overall Official" (Investigator) fields if the Responsible Party information isn't there.
+		else if (clinicalTrialXml.getOverallOfficial().getRole().equals("Principal Investigator") && clinicalTrialXml.getOverallOfficial().getAffiliation().contains("Emory")) {
+			trial.setInvestigatorAffiliation(clinicalTrialXml.getOverallOfficial().getAffiliation());
+			trial.setInvestigatorFullName(clinicalTrialXml.getOverallOfficial().getFirstName() + " " + clinicalTrialXml.getOverallOfficial().getLastName());
+			trial.setInvestigatorTitle(clinicalTrialXml.getOverallOfficial().getRole());
+		}
+		trial.setIsFdaRegulated(clinicalTrialXml.getIsFdaRegulated());
+		trial.setIsSection801(clinicalTrialXml.getIsSection801());
+		trial.setHasExpandedAccess(clinicalTrialXml.getHasExpandedAccess());
+		trial.setOverallContactName(clinicalTrialXml.getOverallContact().getFullName());
+		trial.setOverallContactPhone(clinicalTrialXml.getOverallContact().getPhone());
+		trial.setOverallContactEmail(clinicalTrialXml.getOverallContact().getEmail());
+		trial.setOverallContactBackupName(clinicalTrialXml.getOverallContactBackup().getFullName());
+		trial.setOverallContactBackupPhone(clinicalTrialXml.getOverallContactBackup().getPhone());
+		trial.setOverallContactBackupEmail(clinicalTrialXml.getOverallContactBackup().getEmail());
+		trial.setTransferDate(new Date());
+
+		for (Location location : clinicalTrialXml.getLocations()) {
+			if (location.getFacility().getName().contains("Emory")) {
+				trial.setEmorySpecificStatus(location.getStatus());
+			}
+		}
+
+		return trial;
+	}
+
+	public void setTestNctId(String testNctId) {
+		this.testNctId = testNctId;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Boolean isDbUnlocked() throws Exception {
+		EntityManager em = emf.createEntityManager();
+
+		Query query = em.createQuery("Select l from JobLock l");
+
+		List<JobLock> locks = query.getResultList();
+
+		if (locks.size() == 0) {
+			logger.info("No Existing Locks found ... ");
+			lockDb();
+			logger.info(InetAddress.getLocalHost().getHostName() + " has locked the DB");
+		}
+		else {
+			logger.info("Extract Job will not run on: " + InetAddress.getLocalHost().getHostName() + ". " + "DB is Locked by " + locks.get(0).getServerName());
+		}
+
+		// No Locks; Return true and continue to persist
+		return locks.size() == 0;
+
+	}
+
+	private void lockDb() throws Exception {
+		EntityManager em = emf.createEntityManager();
+		JobLock lock = new JobLock();
+		em.getTransaction().begin();
+		lock.setServerName(InetAddress.getLocalHost().getHostName());
+		em.persist(lock);
+		em.getTransaction().commit();
+	}
+
+	private void unlockDb() throws Exception {
+		logger.info("Extract is complete. Unlocking DB.");
+		EntityManager em = emf.createEntityManager();
+		em.getTransaction().begin();
+		em.createQuery("DELETE FROM JobLock").executeUpdate();
+		em.getTransaction().commit();
+	}
+
+}

@@ -1,0 +1,25 @@
+package edu.emory.clinical.trials.webapp.server.xmlobject;
+
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Sponsor {
+	
+	@XmlElement(name="agency")
+	private String agency;
+	
+	@XmlElement(name="agency_class")
+	private List<Milestone> agencyClass;
+
+	public String getAgency() {
+		return agency;
+	}
+
+	public List<Milestone> getAgencyClass() {
+		return agencyClass;
+	}
+}
