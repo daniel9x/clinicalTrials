@@ -29,7 +29,7 @@
 			<property name="hibernate.connection.username" value="ctapo" />
 			<property name="hibernate.connection.url"
 				value="jdbc:oracle:thin:@ldap://oranamesrvr2.cc.emory.edu/rhitsecd,cn=OracleContext,dc=emory,dc=edu" />
-			<property name="hibernate.connection.password" value="PASSWORD_PLACEHOLDER" />
+			<property name="hibernate.connection.password" value="${credential}" />
 		</properties>
 	</persistence-unit>
 </persistence>

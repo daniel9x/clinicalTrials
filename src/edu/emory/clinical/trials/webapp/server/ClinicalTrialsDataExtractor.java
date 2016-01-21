@@ -1,9 +1,9 @@
 package edu.emory.clinical.trials.webapp.server;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -103,12 +103,12 @@ public class ClinicalTrialsDataExtractor implements Job {
 				String urlString = "https://clinicaltrials.gov/show/" + nctId + "?displayxml=true";
 
 				URL url = new URL(urlString);
-
+				URLConnection connection = url.openConnection();
+				
 				em = emf.createEntityManager();
 
 				try {
-
-					ClinicalTrialXml clinicalTrialXml = (ClinicalTrialXml) unmarshaller.unmarshal(url);
+					ClinicalTrialXml clinicalTrialXml = (ClinicalTrialXml) unmarshaller.unmarshal(connection.getInputStream());
 
 					// Get Data from XML and convert it to (Persistable) Java Object
 					ClinicalTrialStaging trial = convertXmlToStudyObject(clinicalTrialXml);

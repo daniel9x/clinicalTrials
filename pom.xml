@@ -119,6 +119,7 @@
 
 		<testResources>
 			<testResource>
+				<filtering>true</filtering>
 				<directory>test/resources</directory>
 			</testResource>
 		</testResources>
