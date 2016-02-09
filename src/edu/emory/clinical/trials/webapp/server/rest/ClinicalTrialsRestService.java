@@ -342,4 +342,11 @@ public final class ClinicalTrialsRestService {
 		}
 
 	}
+	
+	@GET
+	@Path("/test")
+	@Produces("text/html") 
+	public String getTest() {
+		return "<br><br><br><br><br><br><br><br><br><br><link rel=\"stylesheet\" type=\"text/css\" href=\"../../style.css\"><div><span class='rainbow'><center>GitFlow, Maven, Jenkins, and Docker For The Win!</center></span></div>";
+	}
 }
