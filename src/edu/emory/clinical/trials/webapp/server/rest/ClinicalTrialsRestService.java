@@ -207,7 +207,7 @@ public final class ClinicalTrialsRestService {
 
 	@GET
 	@Path("/total")
-	@JSONP(callback="callback")
+	@JSONP(callback="callback-PaaS")
 	@Produces("application/javascript")
 	public String getTotal(@QueryParam("callback") String callback,
 			@QueryParam("status") String status) throws Exception {
