@@ -14,6 +14,7 @@
   -moz-transition: all 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
   -o-transition: all 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
   transition: all 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  margin-top: 1000px;
 }
 
 .rainbow:hover {
