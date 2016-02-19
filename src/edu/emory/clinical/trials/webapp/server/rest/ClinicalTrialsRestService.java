@@ -346,7 +346,17 @@ public final class ClinicalTrialsRestService {
 	@GET
 	@Path("/test")
 	@Produces("text/html") 
-	public String getTestacular() {
-		return "<center><div><link rel=\"stylesheet\" type=\"text/css\" href=\"../../style.css\"><div><span class='fun'><center>This is the ClinicalTrials Test Page. Yawn?</center></span></div>";
+	public String getTest() {
+		return "<html class='dark'>"
+			 + "<h1>"
+			 + "<center>"
+			 + "<link rel=\"stylesheet\" type=\"text/css\" href=\"../../style.css\">"
+			 + "<center>"
+			 + "<div class='fun'>"
+			 + "<span>"
+			 + "<center>This is the ClinicalTrials Test Page. Yawn.</center>"
+			 + "</span>"
+			 + "</div>"
+			 + "</html>";
 	}
 }

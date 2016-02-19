@@ -1,16 +1,18 @@
-.boring {
+.dark {
   margin-top: 300px;
+  color: white;
+  background-color: black;
 }
 
 .fun {
-  margin-top: 300px;
+  font-size: 75px;
+  background-color: black;
   display: inline-block;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   padding: 10px;
   border: none;
-  font: normal 48px/normal "Warnes", Helvetica, sans-serif;
   color: rgba(255,255,255,1);
   text-decoration: normal;
   text-align: center;
