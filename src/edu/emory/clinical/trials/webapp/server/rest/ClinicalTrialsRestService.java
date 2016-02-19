@@ -352,7 +352,7 @@ public final class ClinicalTrialsRestService {
 			 + "<center>"
 			 + "<link rel=\"stylesheet\" type=\"text/css\" href=\"../../style.css\">"
 			 + "<center>"
-			 + "<div>"
+			 + "<div class='fun'>"
 			 + "<span>"
 			 + "<center>This is the ClinicalTrials Test Page.</center>"
 			 + "</span>"
