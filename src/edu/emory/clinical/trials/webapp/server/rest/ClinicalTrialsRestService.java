@@ -354,7 +354,7 @@ public final class ClinicalTrialsRestService {
 			 + "<center>"
 			 + "<div class='fun'>"
 			 + "<span>"
-			 + "<center>This is the ClinicalTrials Test Page.</center>"
+			 + "<center>This is the ClinicalTrials Test Page!</center>"
 			 + "</span>"
 			 + "</div>"
 			 + "</html>";
