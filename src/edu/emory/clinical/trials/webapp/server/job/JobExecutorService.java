@@ -1,46 +1,29 @@
 package edu.emory.clinical.trials.webapp.server.job;
 
-import javax.annotation.PostConstruct;
+import javax.ejb.Schedule;
 import javax.ejb.Singleton;
-import javax.ejb.Startup;
 
 import org.apache.log4j.Logger;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.JobExecutionException;
-import org.quartz.Scheduler;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.impl.StdScheduler;
-import org.quartz.impl.StdSchedulerFactory;
+
+import edu.emory.clinical.trials.webapp.server.ClinicalTrialsDataExtractor;
+import edu.emory.clinical.trials.webapp.server.LogUtil;
 
 @Singleton
-@Startup
 public class JobExecutorService {
 
-	JobDetail jobDetail;
-	
 	private Logger logger = Logger.getLogger(JobExecutorService.class.getName());
 
-	@PostConstruct
-	public void scheduleJobs() {
+	@Schedule(second = "0", minute = "0", hour = "1",persistent = false)
+	public void executeDataExtractJob() throws Exception {
 		try {
-			Scheduler scheduler = new StdSchedulerFactory().getScheduler();
-			
-			jobDetail = JobBuilder.newJob(ClinicalTrialsDataExtractorJob.class).withIdentity("ClinicalTrials-DataExtractionJob",StdScheduler.DEFAULT_GROUP).build();
-			
-			Trigger trigger = TriggerBuilder.newTrigger().withIdentity("ClinicalTrialsDataExtractionJob").withSchedule(CronScheduleBuilder.cronSchedule("0 0 1 * * ?")).build();
-			
-			scheduler.scheduleJob(jobDetail, trigger);
-			scheduler.start();
+			new ClinicalTrialsDataExtractor().execute();
+			LogUtil.logJobResult("ClinicalTrialsDataExtractJob","", true);
+			logger.info("Extract Job Complete.");
+		}
+		catch (Exception e) {
+			LogUtil.logJobResult("ClinicalTrialsDataExtractJob",e.getMessage(), false);
+			logger.error(e);
+		}
 
-		} catch (JobExecutionException e) {
-			logger.error(e);
-		}
-		catch (Exception e) {  
-			logger.error(e);
-		}
 	}
-
 }

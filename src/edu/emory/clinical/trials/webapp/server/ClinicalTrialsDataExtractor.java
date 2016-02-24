@@ -18,9 +18,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.log4j.Logger;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
 import edu.emory.clinical.trials.webapp.server.entity.ClinicalTrialInterventionStaging;
 import edu.emory.clinical.trials.webapp.server.entity.ClinicalTrialKeywordStaging;
@@ -36,7 +33,7 @@ import edu.emory.clinical.trials.webapp.server.xmlobject.ClinicalTrialXml;
 import edu.emory.clinical.trials.webapp.server.xmlobject.Intervention;
 import edu.emory.clinical.trials.webapp.server.xmlobject.Location;
 
-public class ClinicalTrialsDataExtractor implements Job {
+public class ClinicalTrialsDataExtractor {
 
 	static int locationPrimaryKey = 1;
 
@@ -65,7 +62,7 @@ public class ClinicalTrialsDataExtractor implements Job {
 		}
 	}
 
-	public void execute(JobExecutionContext context) throws JobExecutionException {
+	public void execute() {
 		try {
 			ClinicalTrialsDataExtractor ctExtract = new ClinicalTrialsDataExtractor();
 			ctExtract.extract();	
