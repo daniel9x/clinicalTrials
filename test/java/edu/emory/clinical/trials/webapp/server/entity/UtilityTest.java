@@ -19,11 +19,6 @@ public class UtilityTest {
 
 	@Test
 	public void testJobLog() throws Exception {
-		LogUtil.logJobResult("test", "test", true);
-	}
-
-	@Test
-	public void testJobLogWithEmptyErrorMessage() throws Exception {
-		LogUtil.logJobResult("test", "", true);
+		LogUtil.logJobResult("test", true);
 	}
 }

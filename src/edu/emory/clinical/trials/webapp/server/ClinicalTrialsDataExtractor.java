@@ -62,18 +62,7 @@ public class ClinicalTrialsDataExtractor {
 		}
 	}
 
-	public void execute() {
-		try {
-			ClinicalTrialsDataExtractor ctExtract = new ClinicalTrialsDataExtractor();
-			ctExtract.extract();	
-		}
-		catch (Exception e) {
-			logger.error(e);
-		}
-
-	}
-
-	public void extract() throws Exception {
+	public boolean extract() throws Exception {
 
 		emailManager = new EmailManager();
 
@@ -136,29 +125,33 @@ public class ClinicalTrialsDataExtractor {
 				} catch (SSLException e) {
 					logger.error("ERROR while trying to extract " + nctId + ": ", e);
 					emailManager.sendExtractFailureEmail(e);
-					throw new Exception(e);
+					return false;
 				} catch (UnknownHostException e) {
 					logger.error("ERROR while trying to extract " + nctId + ": ", e);
 					emailManager.sendExtractFailureEmail(e);
-					throw new Exception(e);
+					return false;
 				} catch (IOException e) {
 					logger.error("ERROR while trying to extract " + nctId + ": ", e);
 					logger.error(nctId + " does not exist in ClinicalTrials.gov");
 					ClinicalTrialStaging trial = new ClinicalTrialStaging();
 					trial.setNctId(nctId);
 					trial.setBriefTitle("404: Does not exist in ClinicalTrials.gov");
-					persistObject(trial, em);
+					return false;
 				} catch (Exception e) { 
 					logger.error("ERROR while trying to extract " + nctId + ": ", e);
 					emailManager.sendExtractFailureEmail(e);
-					throw new Exception(e);
+					return false;
 				}
 			}
 
 			unlockDb();
 
 			emailManager.sendExtractSuccessEmail(nctIds.size());
+			return true;
 
+		}
+		else {
+			return false;
 		}
 
 	}

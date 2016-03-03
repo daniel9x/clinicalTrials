@@ -11,6 +11,10 @@
 			value="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" />
 	   </layout>
  </appender>
+ <logger name="org.jboss.logging">
+    <level value="INFO" />
+    <appender-ref ref="FILE"/>
+</logger>
   <root> 
     <priority value ="info" />
     <appender-ref ref="file" /> 

@@ -15,15 +15,11 @@ public class JobExecutorService {
 
 	@Schedule(second = "0", minute = "0", hour = "1",persistent = false)
 	public void executeDataExtractJob() throws Exception {
-		try {
-			new ClinicalTrialsDataExtractor().execute();
-			LogUtil.logJobResult("ClinicalTrialsDataExtractJob","", true);
-			logger.info("Extract Job Complete.");
+		if (new ClinicalTrialsDataExtractor().extract()) {
+			LogUtil.logJobResult("ClinicalTrialsDataExtractJob", true);
+			logger.info("Extract Job Completed Successfully.");
+		} else {
+			LogUtil.logJobResult("ClinicalTrialsDataExtractJob", false);
 		}
-		catch (Exception e) {
-			LogUtil.logJobResult("ClinicalTrialsDataExtractJob",e.getMessage(), false);
-			logger.error(e);
-		}
-
 	}
 }
