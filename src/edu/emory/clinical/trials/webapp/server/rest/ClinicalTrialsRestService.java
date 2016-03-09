@@ -16,7 +16,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.server.JSONP;
 
-import edu.emory.clinical.trials.webapp.server.ClinicalTrialsDataExtractor;
 import edu.emory.clinical.trials.webapp.server.Util;
 import edu.emory.clinical.trials.webapp.server.entity.ClinicalTrialIntervention;
 import edu.emory.clinical.trials.webapp.server.entity.ErmsStudyCRC;
@@ -36,7 +35,7 @@ public final class ClinicalTrialsRestService {
 
 	private final EntityManagerFactory emf;
 
-	private static Logger logger = Logger.getLogger(ClinicalTrialsDataExtractor.class.getName());
+	private static Logger logger = Logger.getLogger(ClinicalTrialsRestService.class.getName());
 
 	public ClinicalTrialsRestService() {
 		if (RestServerConfigurator.getInstance() != null && !Util.isTestMode) {

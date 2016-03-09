@@ -13,13 +13,15 @@ public class JobExecutorService {
 
 	private Logger logger = Logger.getLogger(JobExecutorService.class.getName());
 
-	@Schedule(second = "0", minute = "0", hour = "1",persistent = false)
-	public void executeDataExtractJob() throws Exception {
-		if (new ClinicalTrialsDataExtractor().extract()) {
-			LogUtil.logJobResult("ClinicalTrialsDataExtractJob", true);
-			logger.info("Extract Job Completed Successfully.");
-		} else {
-			LogUtil.logJobResult("ClinicalTrialsDataExtractJob", false);
-		}
-	}
+/*  Commenting out (disabling) nightly job until code moves to live environment to avoid data
+  	conflict with live DEV */
+//	@Schedule(second = "0", minute = "0", hour = "1",persistent = false)
+//	public void executeDataExtractJob() throws Exception {
+//		if (new ClinicalTrialsDataExtractor().extract()) {
+//			LogUtil.logJobResult("ClinicalTrialsDataExtractJob", true);
+//			logger.info("Extract Job Completed Successfully.");
+//		} else {
+//			LogUtil.logJobResult("ClinicalTrialsDataExtractJob", false);
+//		}
+//	}
 }
