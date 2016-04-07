@@ -1,17 +1,16 @@
 package edu.emory.clinical.trials.webapp.server.job;
 
-import javax.ejb.Schedule;
-import javax.ejb.Singleton;
+//import javax.ejb.Schedule;
+//import javax.ejb.Singleton;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
+//
+//import edu.emory.clinical.trials.webapp.server.ClinicalTrialsDataExtractor;
+//import edu.emory.clinical.trials.webapp.server.LogUtil;
 
-import edu.emory.clinical.trials.webapp.server.ClinicalTrialsDataExtractor;
-import edu.emory.clinical.trials.webapp.server.LogUtil;
-
-@Singleton
 public class JobExecutorService {
 
-	private Logger logger = Logger.getLogger(JobExecutorService.class.getName());
+//	private Logger logger = Logger.getLogger(JobExecutorService.class.getName());
 
 /*  Commenting out (disabling) nightly job until code moves to live environment to avoid data
   	conflict with live DEV */
