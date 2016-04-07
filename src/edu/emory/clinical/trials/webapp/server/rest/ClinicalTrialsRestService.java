@@ -349,11 +349,11 @@ public final class ClinicalTrialsRestService {
 		return "<html class='dark'>"
 			 + "<h1>"
 			 + "<center>"
-			 + "<link rel=\"stylesheet\" type=\"text/css\" href=\"../../style.css\">"
+			 + "<link rel='stylesheet' type='text/css' href='../../style.css'>"
 			 + "<center>"
 			 + "<div class='fun'>"
 			 + "<span>"
-			 + "<center>This is the ClinicalTrials Test Page...</center>"
+			 + "<center>This is the ClinicalTrials Test Page...or is it?</center>"
 			 + "</span>"
 			 + "</div>"
 			 + "</html>";
